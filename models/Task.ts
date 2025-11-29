@@ -80,4 +80,28 @@ export class TaskModel {
       throw error;
     }
   }
+
+  static async deleteTask(taskId: string) {
+    try {
+      const collection = await this.getCollection();
+      let objectId;
+      
+      try {
+        objectId = new ObjectId(taskId);
+      } catch (error) {
+        throw new Error('Invalid task ID format');
+      }
+
+      const result = await collection.deleteOne({ _id: objectId });
+      
+      if (result.deletedCount === 0) {
+        throw new Error('Task not found');
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      throw error;
+    }
+  }
 }

@@ -88,6 +88,29 @@ export default function TasksPage() {
     }
   }
 
+  // Delete task
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm('Are you sure you want to delete this task?')) {
+      return
+    }
+
+    setError('')
+    try {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete task')
+      }
+
+      await fetchTasks() // Refresh the list
+    } catch (err) {
+      setError('Unable to delete task. Please try again.')
+      console.error('Error deleting task:', err)
+    }
+  }
+
   // Format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -175,14 +198,22 @@ export default function TasksPage() {
                         {task.status === 'pending' ? 'Pending' : 'Completed'}
                       </span>
                     </div>
-                    {task.status === 'pending' && (
+                    <div className="ml-4 flex gap-2">
+                      {task.status === 'pending' && (
+                        <button
+                          onClick={() => handleMarkAsDone(task._id)}
+                          className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                        >
+                          Mark as Done
+                        </button>
+                      )}
                       <button
-                        onClick={() => handleMarkAsDone(task._id)}
-                        className="ml-4 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                        onClick={() => handleDeleteTask(task._id)}
+                        className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
                       >
-                        Mark as Done
+                        Delete
                       </button>
-                    )}
+                    </div>
                   </div>
                 </li>
               ))}
