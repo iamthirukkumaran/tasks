@@ -11,11 +11,17 @@ export interface Task {
   createdAt: Date;
 }
 
+export interface TaskInput {
+  title: string;
+  status: 'pending' | 'done';
+  createdAt: Date;
+}
+
 export class TaskModel {
   static async getCollection() {
     const client = await clientPromise;
     const db = client.db(DATABASE_NAME);
-    return db.collection<Task>(COLLECTION_NAME);
+    return db.collection<TaskInput>(COLLECTION_NAME);
   }
 
   static async getAllTasks() {
@@ -35,7 +41,7 @@ export class TaskModel {
   static async createTask(taskData: { title: string }) {
     try {
       const collection = await this.getCollection();
-      const task = {
+      const task: TaskInput = {
         title: taskData.title,
         status: 'pending' as const,
         createdAt: new Date()
